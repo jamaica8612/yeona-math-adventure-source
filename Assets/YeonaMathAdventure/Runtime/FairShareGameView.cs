@@ -55,6 +55,17 @@ namespace YeonaMathAdventure
             return BuildSupportMessage(SupportLevel, problem);
         }
 
+        protected override string MissionSpeech()
+        {
+            if (problem == null)
+            {
+                return string.Empty;
+            }
+
+            return problem.itemNameKo + " " + problem.totalItems + "개를 " + problem.recipientCount +
+                   "곳에 똑같이 나눠 줘!";
+        }
+
         protected override void ApplySupportVisuals()
         {
             if ((int)SupportLevel >= (int)ScaffoldLevel.VisualCue)
@@ -63,12 +74,34 @@ namespace YeonaMathAdventure
             }
         }
 
+        // 나머지가 없고 총량을 한 화면에서 셀 수 있으면 만 4세 트랙으로 본다.
+        // 이 구간에서는 수식(예: 17 = 4 × 4 + 1) 대신 세기 언어만 쓴다.
+        public static bool IsCountingLevel(FairShareProblem source)
+        {
+            return source != null && !source.useRemainderTray && source.totalItems <= 10;
+        }
+
         public static string BuildSupportMessage(ScaffoldLevel supportLevel, FairShareProblem source)
         {
             ScaffoldLevel level = DifficultyRules.ClampScaffold((int)supportLevel);
             if (level == ScaffoldLevel.None)
             {
                 return string.Empty;
+            }
+
+            if (IsCountingLevel(source))
+            {
+                if (level == ScaffoldLevel.VisualCue)
+                {
+                    return "노랗게 빛나는 " + source.recipientNameKo + "부터 하나씩 놓아 보자!";
+                }
+
+                if (level == ScaffoldLevel.WorkedExample)
+                {
+                    return "하나씩 번갈아 놓아 보자. 모두 " + source.expectedEach + "개씩 되면 성공이야!";
+                }
+
+                return "한 곳에 하나씩, 번갈아 가며 나눠 주자!";
             }
 
             if (level == ScaffoldLevel.VisualCue)
@@ -269,8 +302,13 @@ namespace YeonaMathAdventure
                 string label = amount == 1 ? string.Empty : "×" + amount;
                 Button button = MathUiKit.CreateButton(sourceZone.contentRoot, "Piece" + index, label,
                     ItemColor(problem.itemNameKo), MathPalette.White, null, 104f, 82f, amount == 1 ? 30f : 24f);
-                PremiumMathVisuals.StyleOval(button.GetComponent<Image>(), ItemColor(problem.itemNameKo));
-                AddPieceHighlight(button.transform, index);
+                // 전용 스프라이트가 Resources에 있으면 그것을 쓰고, 없으면 기존 코드 생성 원으로 폴백.
+                if (!PremiumMathVisuals.TryApplyItemSprite(button.GetComponent<Image>(),
+                        ItemSpriteResource(problem.itemNameKo)))
+                {
+                    PremiumMathVisuals.StyleOval(button.GetComponent<Image>(), ItemColor(problem.itemNameKo));
+                    AddPieceHighlight(button.transform, index);
+                }
                 TouchDragItem drag = button.gameObject.AddComponent<TouchDragItem>();
                 drag.sourceIndex = index;
                 drag.amount = amount;
@@ -556,6 +594,11 @@ namespace YeonaMathAdventure
                 CountHint("지금 가장 적은 상자가 노랗게 빛나요. 그곳부터 채워 보세요.");
                 HighlightNextSupportDestination();
             }
+            else if (IsCountingLevel(problem))
+            {
+                CountHint("모든 " + problem.recipientNameKo + "가 " + problem.expectedEach +
+                          "개씩 받으면 성공이에요.");
+            }
             else
             {
                 CountHint(problem.totalItems + " = " + problem.recipientCount + " × " + problem.expectedEach +
@@ -667,6 +710,14 @@ namespace YeonaMathAdventure
             if (itemName.Contains("별")) return "★";
             if (itemName.Contains("색연필")) return "▰";
             return "◆";
+        }
+
+        public static string ItemSpriteResource(string itemName)
+        {
+            if (itemName.Contains("귤")) return "YeonaMathAdventure/Art/Items/Item-Tangerine";
+            if (itemName.Contains("별")) return "YeonaMathAdventure/Art/Items/Item-Star";
+            if (itemName.Contains("색연필")) return "YeonaMathAdventure/Art/Items/Item-Pencil";
+            return "YeonaMathAdventure/Art/Items/Item-Marble";
         }
 
         private static Color ItemColor(string itemName)

@@ -107,13 +107,42 @@ namespace YeonaMathAdventure.MathCore
             int difficulty = DifficultyRules.Clamp(requestedDifficulty);
             DeterministicRandom random = new DeterministicRandom(seed ^ 0xC8013EA4u);
 
-            int recipientMinimum = difficulty <= 2 ? 2 : 3;
-            int recipientMaximumExclusive = difficulty == 1 ? 5 : Math.Min(10, difficulty + 5);
-            int recipients = random.NextInt(recipientMinimum, recipientMaximumExclusive);
-            int quotientMinimum = difficulty == 1 ? 3 : 4 + difficulty;
-            int quotientMaximumExclusive = difficulty == 1 ? 9 : 9 + difficulty * 4;
-            int each = random.NextInt(quotientMinimum, quotientMaximumExclusive);
-            int remainder = difficulty == 1 ? 0 : random.NextInt(1, recipients);
+            // 난이도 1~2는 만 4세 트랙: 총 10개 이하, 나머지 0, 한 화면에서 셀 수 있는 양.
+            // 나머지(남는 칸) 개념은 난이도 4부터 도입한다.
+            int recipients;
+            int each;
+            int remainder;
+            if (difficulty == 1)
+            {
+                recipients = 2;
+                each = random.NextInt(2, 4);
+                remainder = 0;
+            }
+            else if (difficulty == 2)
+            {
+                recipients = random.NextInt(2, 4);
+                each = random.NextInt(2, 4);
+                remainder = 0;
+            }
+            else if (difficulty == 3)
+            {
+                recipients = random.NextInt(2, 5);
+                each = random.NextInt(3, 6);
+                remainder = 0;
+            }
+            else if (difficulty == 4)
+            {
+                recipients = random.NextInt(3, 5);
+                each = random.NextInt(4, 7);
+                remainder = random.NextInt(1, recipients);
+            }
+            else
+            {
+                recipients = random.NextInt(3, 7);
+                each = random.NextInt(6, 11);
+                remainder = random.NextInt(1, recipients);
+            }
+
             int total = each * recipients + remainder;
             string item = ItemNames[random.NextInt(0, ItemNames.Length)];
             string recipient = RecipientNames[random.NextInt(0, RecipientNames.Length)];

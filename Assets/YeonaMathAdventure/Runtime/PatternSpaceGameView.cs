@@ -51,6 +51,11 @@ namespace YeonaMathAdventure
             return BuildSupportMessage(SupportLevel, problem);
         }
 
+        protected override string MissionSpeech()
+        {
+            return problem == null ? string.Empty : GardenMissionLine(problem);
+        }
+
         protected override void ApplySupportVisuals()
         {
             if ((int)SupportLevel < (int)ScaffoldLevel.VisualCue)

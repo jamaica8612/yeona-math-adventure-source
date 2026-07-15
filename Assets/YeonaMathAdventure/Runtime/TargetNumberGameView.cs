@@ -50,6 +50,11 @@ namespace YeonaMathAdventure
             return BuildSupportMessage(SupportLevel, problem);
         }
 
+        protected override string MissionSpeech()
+        {
+            return problem == null ? string.Empty : "별다리의 힘을 " + problem.target + "으로 맞춰 줘!";
+        }
+
         protected override void ApplySupportVisuals()
         {
             if ((int)SupportLevel < (int)ScaffoldLevel.VisualCue || liveValueText == null)

@@ -39,10 +39,70 @@ namespace YeonaMathAdventure.MathCore.Tests
                 FairShareProblem problem = FairShareGenerator.Generate((uint)(900 + difficulty), difficulty);
                 Assert.That(problem.expectedEach, Is.EqualTo(problem.totalItems / problem.recipientCount));
                 Assert.That(problem.expectedRemainder, Is.EqualTo(problem.totalItems % problem.recipientCount));
-                if (difficulty > 1)
+                if (difficulty >= 4)
                 {
                     Assert.That(problem.expectedRemainder, Is.GreaterThan(0));
                     Assert.That(problem.expectedRemainder, Is.LessThan(problem.recipientCount));
+                }
+                else
+                {
+                    Assert.That(problem.expectedRemainder, Is.Zero,
+                        "나머지 개념은 난이도 4부터 도입한다: " + problem.id);
+                }
+            }
+        }
+
+        [Test]
+        public void FairShare_Age4Track_KeepsCountsTinyAndRemainderFree()
+        {
+            for (int difficulty = 1; difficulty <= 2; difficulty++)
+            {
+                for (int seedIndex = 0; seedIndex < 300; seedIndex++)
+                {
+                    FairShareProblem problem = FairShareGenerator.Generate(
+                        (uint)(difficulty * 50000 + seedIndex), difficulty);
+                    Assert.That(problem.totalItems, Is.LessThanOrEqualTo(difficulty == 1 ? 6 : 9), problem.id);
+                    Assert.That(problem.totalItems, Is.GreaterThanOrEqualTo(4), problem.id);
+                    Assert.That(problem.recipientCount, Is.LessThanOrEqualTo(difficulty == 1 ? 2 : 3), problem.id);
+                    Assert.That(problem.expectedRemainder, Is.Zero, problem.id);
+                    Assert.That(problem.useRemainderTray, Is.False, problem.id);
+                }
+            }
+        }
+
+        [Test]
+        public void TargetNumber_Age4Track_IsSmallAdditionOnly()
+        {
+            for (int seedIndex = 0; seedIndex < 300; seedIndex++)
+            {
+                TargetNumberProblem easiest = TargetNumberGenerator.Generate((uint)(60000 + seedIndex), 1);
+                Assert.That(easiest.target, Is.InRange(3, 6), easiest.id);
+                Assert.That(easiest.operatorBlocks, Is.EqualTo(new[] { ArithmeticOperator.Add }), easiest.id);
+                Assert.That(easiest.maximumNumbersUsed, Is.EqualTo(2), easiest.id);
+                Assert.That(TargetNumberValidator.Validate(easiest, easiest.knownSolutionExpression).IsSolved,
+                    Is.True, easiest.id);
+
+                TargetNumberProblem bridge = TargetNumberGenerator.Generate((uint)(70000 + seedIndex), 2);
+                Assert.That(bridge.target, Is.InRange(4, 10), bridge.id);
+                Assert.That(bridge.maximumNumbersUsed, Is.EqualTo(2), bridge.id);
+                Assert.That(TargetNumberValidator.Validate(bridge, bridge.knownSolutionExpression).IsSolved,
+                    Is.True, bridge.id);
+            }
+        }
+
+        [Test]
+        public void NumericSequence_Age4Track_CountsByOneFromSmallStart()
+        {
+            for (int seedIndex = 0; seedIndex < 300; seedIndex++)
+            {
+                PatternSpaceProblem problem = PatternSpaceGenerator.Generate(
+                    (uint)(80000 + seedIndex), 1, PatternPuzzleKind.NumericSequence);
+                Assert.That(problem.boardTiles.Length, Is.EqualTo(5), problem.id);
+                Assert.That(problem.boardTiles[0].value, Is.InRange(1, 3), problem.id);
+                for (int index = 1; index < problem.boardTiles.Length; index++)
+                {
+                    Assert.That(problem.boardTiles[index].value,
+                        Is.EqualTo(problem.boardTiles[index - 1].value + 1), problem.id);
                 }
             }
         }

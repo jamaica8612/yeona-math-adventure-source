@@ -46,6 +46,18 @@ namespace YeonaMathAdventure
             BuildShell();
             BuildGame();
             ApplyAutomaticSupport();
+            YeonaVoice.Speak(OpeningVoiceKey(), OpeningLine());
+            string mission = MissionSpeech();
+            if (!string.IsNullOrEmpty(mission))
+            {
+                YeonaVoice.Speak(null, mission, false);
+            }
+        }
+
+        /// <summary>이번 라운드 과제를 말로 알려 줄 문장. 반디의 인사말 뒤에 이어 재생된다.</summary>
+        protected virtual string MissionSpeech()
+        {
+            return string.Empty;
         }
 
         protected abstract void BuildGame();
@@ -69,12 +81,14 @@ namespace YeonaMathAdventure
             string combined = string.IsNullOrEmpty(hint) ? message : message + "\n" + hint;
             SetFeedback(combined, MathPalette.DeepBlue);
             Journey.Pulse(FeedbackText.rectTransform);
+            YeonaVoice.Speak(combined);
         }
 
         protected void ShowGentleMessage(string message)
         {
             SetFeedback(message, MathPalette.DeepBlue);
             Journey.Pulse(FeedbackText.rectTransform);
+            YeonaVoice.Speak(message);
         }
 
         protected void CountHint(string message)
@@ -82,6 +96,7 @@ namespace YeonaMathAdventure
             HintsUsed++;
             SetFeedback(message, MathPalette.DeepBlue);
             Journey.Pulse(FeedbackText.rectTransform);
+            YeonaVoice.Speak(message);
         }
 
         protected void Complete()
@@ -155,6 +170,19 @@ namespace YeonaMathAdventure
             Body = MathUiKit.CreatePanel(Screen, "GameBody", new Color(1f, 1f, 1f, 0.12f), -1f, -1f);
             MathUiKit.Pin(Body, new Vector2(0.035f, 0.055f), new Vector2(0.965f, 0.745f),
                 Vector2.zero, Vector2.zero);
+        }
+
+        private string OpeningVoiceKey()
+        {
+            switch (ActivityKind)
+            {
+                case MathActivityKind.FairShare:
+                    return "opening_fairshare";
+                case MathActivityKind.PatternSpace:
+                    return "opening_patternspace";
+                default:
+                    return "opening_targetnumber";
+            }
         }
 
         private string OpeningLine()
