@@ -277,6 +277,12 @@ namespace YeonaMathAdventure.Editor
                 throw new BuildFailedException("Pretendard TMP atlas was not created.");
             }
 
+            // 필요한 글리프를 전부 구운 뒤에는 정적 아틀라스로 고정한다. Dynamic 모드는
+            // 실행 시마다 FontEngine이 소스 폰트를 다시 여는데, 일부 기기에서 간헐적으로
+            // 실패해 모든 라벨이 사라지는 회귀(재실행 시 빈 텍스트)를 일으켰다. 새 문자열을
+            // 추가하면 SetupProject가 다시 돌며 재수집하므로 정적으로도 누락이 없다.
+            fontAsset.atlasPopulationMode = AtlasPopulationMode.Static;
+
             // Recreate deterministically so SetupProject also repairs a stale or
             // partially generated font asset from an interrupted previous run.
             AssetDatabase.DeleteAsset(PretendardTmpAssetPath);

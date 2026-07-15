@@ -424,7 +424,9 @@ namespace YeonaMathAdventure
             cached = Resources.Load<TMP_FontAsset>(PrebuiltFontResourcePath);
             if (cached != null)
             {
-                ConfigureDynamicFont(cached);
+                // 빌드 때 필요한 글리프를 전부 구워 둔 에셋은 그대로 쓴다. 여기서 Dynamic으로
+                // 되돌리면 실행마다 FontEngine이 소스 폰트를 다시 여는데, 일부 기기에서
+                // 간헐적으로 실패해 앱의 모든 라벨이 사라진다(재실행 시 빈 텍스트 회귀).
                 return cached;
             }
 

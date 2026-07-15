@@ -42,7 +42,8 @@ namespace YeonaMathAdventure.Tests
                 "A Dynamic TMP font requires its source OTF in the player.");
             Assert.That(AssetDatabase.GetAssetPath(fontAsset.sourceFontFile),
                 Is.EqualTo("Assets/YeonaMathAdventure/Resources/Fonts/Pretendard-Regular.otf"));
-            Assert.That(fontAsset.atlasPopulationMode, Is.EqualTo(AtlasPopulationMode.Dynamic));
+            Assert.That(fontAsset.atlasPopulationMode, Is.EqualTo(AtlasPopulationMode.Static),
+                "런타임 글리프 래스터라이즈(Dynamic)는 기기별 간헐 실패로 전체 라벨을 지운다 — 정적으로 고정.");
             Assert.That(fontAsset.isMultiAtlasTexturesEnabled, Is.True);
 
             Assert.That(fontAsset.material, Is.Not.Null);
@@ -60,6 +61,9 @@ namespace YeonaMathAdventure.Tests
             Assert.That(fontAsset.HasCharacter('연'), Is.True);
             Assert.That(fontAsset.HasCharacter('아'), Is.True);
             Assert.That(fontAsset.HasCharacter('×'), Is.True);
+            Assert.That(fontAsset.HasCharacter('랗'), Is.True,
+                "만 4세 트랙에서 추가된 안내 문구의 글리프도 정적 아틀라스에 있어야 한다.");
+            Assert.That(fontAsset.HasCharacter('빛'), Is.True);
 
             var serializedFont = new SerializedObject(fontAsset);
             SerializedProperty clearDynamicData = serializedFont.FindProperty("m_ClearDynamicDataOnBuild");
