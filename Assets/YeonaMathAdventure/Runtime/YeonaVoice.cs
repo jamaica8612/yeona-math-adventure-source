@@ -21,6 +21,10 @@ namespace YeonaMathAdventure
         private static AndroidJavaObject tts;
         private static volatile bool ttsReady;
         private static TtsInitListener initListener;
+        // TTS 엔진이 준비되기 전(첫 1~2초)에 들어온 대사를 버리지 않고 모아 뒀다가
+        // onInit 직후 순서대로 재생한다. 시작 화면 인사말이 이 구간에 걸린다.
+        private static readonly System.Collections.Generic.List<string> pendingUtterances =
+            new System.Collections.Generic.List<string>();
 #endif
 
         public static void Initialize(MonoBehaviour host)
@@ -89,20 +93,22 @@ namespace YeonaMathAdventure
             }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            if (tts == null || !ttsReady)
+            if (!ttsReady)
             {
+                lock (pendingUtterances)
+                {
+                    if (interrupt)
+                    {
+                        pendingUtterances.Clear();
+                    }
+
+                    pendingUtterances.Add(sanitized);
+                }
+
                 return;
             }
 
-            try
-            {
-                int queueMode = interrupt ? 0 : 1; // QUEUE_FLUSH : QUEUE_ADD
-                tts.Call<int>("speak", sanitized, queueMode, (AndroidJavaObject)null, "yeona_voice");
-            }
-            catch (System.Exception exception)
-            {
-                Debug.LogWarning("[Yeona Voice] speak 실패: " + exception.Message);
-            }
+            SpeakThroughTts(sanitized, interrupt);
 #else
             Debug.Log("[Yeona Voice] " + (clipKey ?? "-") + " :: " + sanitized);
 #endif
@@ -131,6 +137,41 @@ namespace YeonaMathAdventure
             initialized = false;
             clipSource = null;
         }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        private static void SpeakThroughTts(string sanitized, bool interrupt)
+        {
+            if (tts == null)
+            {
+                return;
+            }
+
+            try
+            {
+                int queueMode = interrupt ? 0 : 1; // QUEUE_FLUSH : QUEUE_ADD
+                tts.Call<int>("speak", sanitized, queueMode, (AndroidJavaObject)null, "yeona_voice");
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogWarning("[Yeona Voice] speak 실패: " + exception.Message);
+            }
+        }
+
+        private static void FlushPendingUtterances()
+        {
+            string[] queued;
+            lock (pendingUtterances)
+            {
+                queued = pendingUtterances.ToArray();
+                pendingUtterances.Clear();
+            }
+
+            for (int index = 0; index < queued.Length; index++)
+            {
+                SpeakThroughTts(queued[index], index == 0);
+            }
+        }
+#endif
 
         private static bool TryPlayClip(string clipKey, bool interrupt)
         {
@@ -236,6 +277,8 @@ namespace YeonaMathAdventure
                     tts.Call<int>("setSpeechRate", 0.9f);
                     tts.Call<int>("setPitch", 1.05f);
                     ttsReady = true;
+                    Debug.Log("[Yeona Voice] TTS ready (ko-KR)");
+                    FlushPendingUtterances();
                 }
                 catch (System.Exception exception)
                 {
