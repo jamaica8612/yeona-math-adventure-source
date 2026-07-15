@@ -162,34 +162,30 @@ namespace YeonaMathAdventure.MathCore
 
             if (difficulty == 1)
             {
-                int target = random.NextInt(20, 46);
-                int left = random.NextInt(6, target - 5);
+                // 만 4세 트랙: 5 이하 덧셈만. 블록 두 개를 이어 3~6을 만든다.
+                int target = random.NextInt(3, 7);
+                int left = random.NextInt(1, target);
                 int right = target - left;
                 problem.target = target;
+                problem.operatorBlocks = new[] { ArithmeticOperator.Add };
+                problem.minimumNumbersUsed = 2;
+                problem.maximumNumbersUsed = 2;
+                problem.knownSolutionExpression = Format(left) + " + " + Format(right);
+                requiredNumbers = new[] { left, right };
+                distractors = new[] { random.NextInt(1, 4), random.NextInt(1, 6) };
+            }
+            else if (difficulty == 2)
+            {
+                // 10 이하 덧셈. 빼기 블록은 보기로만 등장해 고르는 연습을 겸한다.
+                int left = random.NextInt(2, 6);
+                int right = random.NextInt(2, 6);
+                problem.target = left + right;
                 problem.operatorBlocks = new[] { ArithmeticOperator.Add, ArithmeticOperator.Subtract };
                 problem.minimumNumbersUsed = 2;
                 problem.maximumNumbersUsed = 2;
                 problem.knownSolutionExpression = Format(left) + " + " + Format(right);
                 requiredNumbers = new[] { left, right };
-                distractors = new[] { random.NextInt(2, 15), random.NextInt(3, 18) };
-            }
-            else if (difficulty == 2)
-            {
-                int left = random.NextInt(5, 11);
-                int right = random.NextInt(5, 11);
-                int offset = random.NextInt(5, 16);
-                problem.target = left * right + offset;
-                problem.operatorBlocks = new[]
-                {
-                    ArithmeticOperator.Multiply,
-                    ArithmeticOperator.Add,
-                    ArithmeticOperator.Subtract
-                };
-                problem.minimumNumbersUsed = 3;
-                problem.maximumNumbersUsed = 3;
-                problem.knownSolutionExpression = Format(left) + " × " + Format(right) + " + " + Format(offset);
-                requiredNumbers = new[] { left, right, offset };
-                distractors = new[] { random.NextInt(2, 16), random.NextInt(5, 21) };
+                distractors = new[] { random.NextInt(1, 7), random.NextInt(1, 10) };
             }
             else if (difficulty == 3)
             {

@@ -258,9 +258,25 @@ namespace YeonaMathAdventure.MathCore
 
         private static PatternSpaceProblem GenerateNumericSequence(DeterministicRandom random, int difficulty)
         {
-            int length = difficulty >= 4 ? 7 : 6;
-            int start = random.NextInt(8, 26 + difficulty * 5);
-            int step = random.NextInt(2 + difficulty, 6 + difficulty * 2);
+            // 난이도 1은 만 4세 트랙: 1부터 하나씩 이어 세기(1 2 3 _ 5). 난이도 2는 1~2씩 뛰기.
+            int length = difficulty >= 4 ? 7 : difficulty == 1 ? 5 : 6;
+            int start;
+            int step;
+            if (difficulty == 1)
+            {
+                start = random.NextInt(1, 4);
+                step = 1;
+            }
+            else if (difficulty == 2)
+            {
+                start = random.NextInt(1, 6);
+                step = random.NextInt(1, 3);
+            }
+            else
+            {
+                start = random.NextInt(8, 26 + difficulty * 5);
+                step = random.NextInt(2 + difficulty, 6 + difficulty * 2);
+            }
             PatternTile[] cells = new PatternTile[length];
             for (int index = 0; index < length; index++)
             {

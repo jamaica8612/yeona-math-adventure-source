@@ -18,6 +18,42 @@ namespace YeonaMathAdventure
 
         private static Sprite roundedSprite;
         private static Sprite circleSprite;
+        private static readonly System.Collections.Generic.Dictionary<string, Sprite> loadedSprites =
+            new System.Collections.Generic.Dictionary<string, Sprite>();
+
+        /// <summary>
+        /// Resources에 전용 아트가 있으면 이미지에 입히고 true를 돌려준다. 아트가 아직
+        /// 없으면 false — 호출부는 기존 코드 생성 도형으로 폴백한다.
+        /// </summary>
+        public static bool TryApplyItemSprite(Image image, string resourcePath)
+        {
+            if (image == null || string.IsNullOrEmpty(resourcePath))
+            {
+                return false;
+            }
+
+            Sprite sprite;
+            if (!loadedSprites.TryGetValue(resourcePath, out sprite))
+            {
+                Texture2D texture = Resources.Load<Texture2D>(resourcePath);
+                sprite = texture == null
+                    ? null
+                    : Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height),
+                        new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect);
+                loadedSprites[resourcePath] = sprite;
+            }
+
+            if (sprite == null)
+            {
+                return false;
+            }
+
+            image.sprite = sprite;
+            image.type = Image.Type.Simple;
+            image.preserveAspect = true;
+            image.color = Color.white;
+            return true;
+        }
 
         public static void AddBackdrop(Transform parent, string resourcePath, Color veil)
         {

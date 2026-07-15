@@ -51,7 +51,7 @@ namespace YeonaMathAdventure.MathCore.Tests
                     TargetNumberProblem second = TargetNumberGenerator.Generate(seed, difficulty);
 
                     AssertTargetEqual(first, second);
-                    Assert.That(first.target, Is.GreaterThanOrEqualTo(20), first.id);
+                    Assert.That(first.target, Is.GreaterThanOrEqualTo(difficulty >= 3 ? 20 : 3), first.id);
                     Assert.That(first.difficulty, Is.EqualTo(difficulty));
                     Assert.That(first.minimumNumbersUsed, Is.GreaterThanOrEqualTo(2));
                     Assert.That(first.maximumNumbersUsed, Is.LessThanOrEqualTo(first.numberBlocks.Length));

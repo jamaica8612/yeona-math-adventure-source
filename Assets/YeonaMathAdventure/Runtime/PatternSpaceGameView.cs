@@ -51,6 +51,11 @@ namespace YeonaMathAdventure
             return BuildSupportMessage(SupportLevel, problem);
         }
 
+        protected override string MissionSpeech()
+        {
+            return problem == null ? string.Empty : GardenMissionLine(problem);
+        }
+
         protected override void ApplySupportVisuals()
         {
             if ((int)SupportLevel < (int)ScaffoldLevel.VisualCue)
@@ -162,8 +167,8 @@ namespace YeonaMathAdventure
                 MathPalette.Ink, TextAlignmentOptions.Left, FontStyles.Bold);
             MathUiKit.Pin(prompt.rectTransform, new Vector2(0.035f, 0.08f), new Vector2(0.76f, 0.92f),
                 Vector2.zero, Vector2.zero);
-            Button help = MathUiKit.CreateButton(mission, "BandiHelp", "?", MathPalette.Lavender,
-                MathPalette.White, ShowHint, 76f, 64f, 30f);
+            Button help = MathUiKit.CreateButton(mission, "BandiHelp", "힌트", MathPalette.Lavender,
+                MathPalette.NightBlue, ShowHint, 76f, 64f, 22f);
             MathUiKit.ExpandHitTarget(help);
             MathUiKit.Pin(help.GetComponent<RectTransform>(), new Vector2(0.80f, 0.12f),
                 new Vector2(0.875f, 0.88f), Vector2.zero, Vector2.zero);

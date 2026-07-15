@@ -132,6 +132,7 @@ namespace YeonaMathAdventure
             MigratePremiumExperienceIfNeeded();
             rewardBridge = new DirectMathAnturaRewardBridge();
             EnsureVisibleConcepts();
+            YeonaVoice.Initialize(this);
         }
 
         private void MigratePremiumExperienceIfNeeded()
@@ -169,6 +170,7 @@ namespace YeonaMathAdventure
         private void OnApplicationQuit()
         {
             SaveAll();
+            YeonaVoice.Shutdown();
         }
 
         public uint NextProblemSeed()
@@ -297,11 +299,12 @@ namespace YeonaMathAdventure
             MathUiKit.Pin(storyCard, new Vector2(0.045f, 0.08f), new Vector2(0.52f, 0.54f),
                 Vector2.zero, Vector2.zero);
 
-            TMP_Text invitation = MathUiKit.CreateText(storyCard, "Invitation",
-                meta.assessmentComplete
-                    ? ChildDisplayNameKo + "야, 오늘은 어떤 별섬을 깨워 볼까?"
-                    : ChildDisplayNameKo + "야, 별다리가 잠들었어!\n우리 손으로 다시 반짝이게 해 주자.",
+            string invitationLine = meta.assessmentComplete
+                ? ChildDisplayNameKo + "야, 오늘은 어떤 별섬을 깨워 볼까?"
+                : ChildDisplayNameKo + "야, 별다리가 잠들었어!\n우리 손으로 다시 반짝이게 해 주자.";
+            TMP_Text invitation = MathUiKit.CreateText(storyCard, "Invitation", invitationLine,
                 39f, MathPalette.Ink, TextAlignmentOptions.TopLeft, FontStyles.Bold);
+            YeonaVoice.Speak(meta.assessmentComplete ? "start_returning" : "start_first_visit", invitationLine);
             MathUiKit.Pin(invitation.rectTransform, new Vector2(0.07f, 0.42f), new Vector2(0.93f, 0.91f),
                 Vector2.zero, Vector2.zero);
 
@@ -571,6 +574,8 @@ namespace YeonaMathAdventure
             TMP_Text invitation = MathUiKit.CreateText(card, "RewardInvitation",
                 "마음에 드는 선물을 하나 골라 봐.", 29f, MathPalette.DeepBlue,
                 TextAlignmentOptions.Center, FontStyles.Normal);
+            YeonaVoice.Speak("placement_result",
+                ChildDisplayNameKo + "야, 첫 별섬이 깨어났어! 마음에 드는 선물을 하나 골라 봐.");
             MathUiKit.Pin(invitation.rectTransform, new Vector2(0.08f, 0.58f), new Vector2(0.92f, 0.72f),
                 Vector2.zero, Vector2.zero);
 
@@ -642,6 +647,8 @@ namespace YeonaMathAdventure
             MathUiKit.Pin(nextButton.GetComponent<RectTransform>(), new Vector2(0.18f, 0.07f),
                 new Vector2(0.82f, 0.27f), Vector2.zero, Vector2.zero);
             StartCoroutine(CelebrateRoutine(card, starText));
+            YeonaVoice.Speak("success_" + activity.ToString().ToLowerInvariant(),
+                SuccessHeading(activity) + " " + SuccessReaction(activity));
         }
 
         private void CreateFeaturePill(Transform parent, string label, Color color)
