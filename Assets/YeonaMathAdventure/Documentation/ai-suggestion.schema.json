@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local.yeona-math.invalid/schemas/ai-activity-suggestion-v1.json",
+  "title": "Yeona Math Adventure AI activity suggestion",
+  "description": "AI may select a verified local problem and rewrite Korean presentation text. It cannot provide operands, answers, conditions, scoring, or child data.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "requestId",
+    "problemKind",
+    "conceptKey",
+    "difficulty",
+    "sourceProblemId",
+    "promptKo",
+    "hintsKo"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "requestId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,64}$"
+    },
+    "problemKind": {
+      "enum": ["target_number", "fair_share", "pattern_space"]
+    },
+    "conceptKey": {
+      "enum": [
+        "target_number",
+        "division_remainder",
+        "numeric_pattern",
+        "shape_pattern",
+        "rotation",
+        "symmetry",
+        "spatial_reasoning"
+      ]
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "sourceProblemId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,80}$"
+    },
+    "promptKo": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 180
+    },
+    "hintsKo": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    }
+  }
+}

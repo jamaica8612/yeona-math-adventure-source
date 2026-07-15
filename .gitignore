@@ -1,0 +1,32 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# IDE and local tooling
+.vs/
+.vscode/
+.idea/
+.gradle/
+BuildTools/
+TestResults/
+*.csproj
+*.sln
+*.slnx
+*.user
+
+# Built packages and signing material
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# OS files
+.DS_Store
+Thumbs.db
+

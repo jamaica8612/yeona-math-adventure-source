@@ -1,0 +1,4 @@
+Antura upstream: https://github.com/vgwb/Antura
+Base commit: a60a8ba9e87d054aea5d757188cc2050e9289fb1
+Unity editor: 6000.4.11f1
+
