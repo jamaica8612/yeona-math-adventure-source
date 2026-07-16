@@ -240,7 +240,28 @@ namespace YeonaPetPlayhouse.Editor
                 throw new BuildFailedException("Runtime source folder was not found at '" + runtimeRoot + "'.");
             }
 
-            foreach (string filePath in Directory.EnumerateFiles(runtimeRoot, "*.cs", SearchOption.AllDirectories))
+            AddCharactersFromFiles(characters, runtimeRoot, "*.cs");
+
+            string documentationRoot = Path.Combine(
+                Application.dataPath,
+                "YeonaPetPlayhouse",
+                "Documentation");
+            if (!Directory.Exists(documentationRoot))
+            {
+                throw new BuildFailedException(
+                    "Documentation folder was not found at '" + documentationRoot + "'.");
+            }
+
+            AddCharactersFromFiles(characters, documentationRoot, "*.md");
+            return new string(characters.ToArray());
+        }
+
+        private static void AddCharactersFromFiles(
+            System.Collections.Generic.SortedSet<char> characters,
+            string root,
+            string searchPattern)
+        {
+            foreach (string filePath in Directory.EnumerateFiles(root, searchPattern, SearchOption.AllDirectories))
             {
                 foreach (char character in File.ReadAllText(filePath, Encoding.UTF8))
                 {
@@ -250,8 +271,6 @@ namespace YeonaPetPlayhouse.Editor
                     }
                 }
             }
-
-            return new string(characters.ToArray());
         }
 
         private static void CreateMinimalScene()
